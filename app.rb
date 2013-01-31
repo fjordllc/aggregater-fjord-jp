@@ -12,7 +12,7 @@ configure do
 end
 
 get '/' do
-  Garb::Session.login(ENV['GOOGLE_ACCOUNT'], ENV['GOOGLE_PASSWORD'])
+  Garb::Session.login('office@fjord.jp', 'officefjord')
   profile = Garb::Management::Profile.all.detect { |p| p.web_property_id == 'UA-2927688-13' }
 
   yesterday = Time.now.yesterday
