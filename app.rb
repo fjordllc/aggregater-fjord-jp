@@ -14,29 +14,29 @@ configure do
   set :profile, profile
 end
 
-get '/yesterday-pageviews' do
+get '/' do
   yesterday = Time.now.yesterday
   analytics = settings.profile.page_view(
     start_date: yesterday.beginning_of_day,
     end_date:   yesterday.end_of_day,
   )
-  json :pageviews => analytics.first.pageviews
-end
+  yesterday_pageviews = analytics.first.pageviews
 
-get '/last-a-week-pageviews' do
-  yesterday = Time.now.yesterday
   analytics = settings.profile.page_view(
     start_date: yesterday.prev_week,
     end_date:   yesterday,
   )
-  json :pageviews => analytics.first.pageviews
-end
+  last_week_pageviews = analytics.first.pageviews
 
-get '/last-a-month-pageviews' do
-  yesterday = Time.now.yesterday
   analytics = settings.profile.page_view(
     start_date: yesterday.prev_month,
     end_date:   yesterday,
   )
-  json :pageviews => analytics.first.pageviews
+  last_month_pageviews = analytics.first.pageviews
+
+  json pageviews: {
+    yesterday: yesterday_pageviews,
+    last_week: last_week_pageviews,
+    last_month: last_month_pageviews
+  }
 end
