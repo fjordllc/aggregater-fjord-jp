@@ -1,6 +1,6 @@
 source :rubygems
 
 gem 'garb'
-gem 'active_support', '~> 3.0.0'
+gem 'activesupport'
 gem 'sinatra'
 gem 'sinatra-contrib'
