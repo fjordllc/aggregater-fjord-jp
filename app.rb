@@ -43,8 +43,6 @@ get '/' do
 end
 
 get '/profit' do
-  OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
-
   result = {}
 
   a = Mechanize.new
