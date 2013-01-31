@@ -1,14 +1,14 @@
+# encoding: utf-8
 require 'garb'
 require 'active_support/time'
 require 'sinatra'
 require 'sinatra/json'
+require 'mechanize'
+require 'openssl'
 
 class PageView
   extend Garb::Model
   metrics :pageviews
-end
-
-configure do
 end
 
 get '/' do
@@ -39,4 +39,28 @@ get '/' do
     last_week:  last_week_pageviews,
     last_month: last_month_pageviews
   }
+end
+
+get '/profit' do
+  OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
+
+  result = {}
+
+  a = Mechanize.new
+  a.get('https://www.nend.net/admin/login') do |page|
+    home_page = page.form_with(name: 'loginform') do |f|
+      f['data[User][mail]'] = 'komagata@gmail.com'
+      f['data[User][pass]'] = 'komagatafjord'
+    end.submit
+  end
+
+  a.get('https://www.nend.net/m/report/search/m') do |page|
+    result['impression'] = page.search('.impression_graph p').last.content.gsub(/,/, '').to_i
+    result['click'] = page.search('.click_graph p').last.content.gsub(/,/, '').to_i
+    result['ctr'] = page.search('.ctr_graph p').last.content.gsub(/,/, '').to_f
+    result['cpm'] = page.search('.cpm_graph p').last.content.gsub(/[￥,]/, '').to_f
+    result['payment'] = page.search('.payment_graph p').last.content.gsub(/[￥,]/, '').to_i
+  end
+
+  json result
 end
