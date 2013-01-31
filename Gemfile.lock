@@ -32,7 +32,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  active_support
+  active_support (~> 3.0.0)
   garb
   sinatra
   sinatra-contrib
