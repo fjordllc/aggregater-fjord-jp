@@ -5,6 +5,7 @@ require 'sinatra'
 require 'sinatra/json'
 require 'mechanize'
 require 'openssl'
+require 'certified'
 
 class PageView
   extend Garb::Model
