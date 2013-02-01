@@ -53,7 +53,13 @@ get '/profit' do
     end.submit
   end
 
-  a.get('https://www.nend.net/m/report/search/m') do |page|
+  yesterday = Time.now.yesterday
+
+  range = CGI.escape(yesterday.prev_month.strftime('%Y/%m/%d')) +
+          '+-+' +
+          CGI.escape(yesterday.strftime('%Y/%m/%d'))
+
+  a.get("https://www.nend.net/m/report/search/m?search_date=#{range}") do |page|
     result['impression'] = page.search('.impression_graph p').last.content.gsub(/,/, '').to_i
     result['click'] = page.search('.click_graph p').last.content.gsub(/,/, '').to_i
     result['ctr'] = page.search('.ctr_graph p').last.content.gsub(/,/, '').to_f
