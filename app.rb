@@ -37,7 +37,7 @@ get '/' do
   )
   two_weeks_ago_pageviews = analytics.first.pageviews
 
-  growth_per_week = last_week_pageviews.to_f / two_weeks_ago_pageviews.to_f * 100.0 - 100.0
+  growth_per_week = (last_week_pageviews.to_f / two_weeks_ago_pageviews.to_f * 100.0 - 100.0).round(2)
 
   analytics = profile.page_view(
     start_date: yesterday.prev_month,
@@ -50,7 +50,7 @@ get '/' do
     last_week:  last_week_pageviews,
     last_month: last_month_pageviews,
     two_weeks_ago_pageviews: two_weeks_ago_pageviews,
-    growth_per_week: growth_per_week.round(2)
+    growth_per_week: growth_per_week
   }
 end
 
@@ -78,6 +78,26 @@ get '/profit' do
     result['cpm'] = page.search('.cpm_graph p').last.content.gsub(/[￥,]/, '').to_f
     result['payment'] = page.search('.payment_graph p').last.content.gsub(/[￥,]/, '').to_i
   end
+
+  # last week
+  range = CGI.escape(yesterday.prev_week.strftime('%Y/%m/%d')) +
+          '+-+' +
+          CGI.escape(yesterday.strftime('%Y/%m/%d'))
+
+  a.get("https://www.nend.net/m/report/search/m?search_date=#{range}") do |page|
+    result['last_week_payment'] = page.search('.payment_graph p').last.content.gsub(/[￥,]/, '').to_i
+  end
+
+  # two weeks ago
+  range = CGI.escape(yesterday.prev_week.prev_week.strftime('%Y/%m/%d')) +
+          '+-+' +
+          CGI.escape(yesterday.prev_week.strftime('%Y/%m/%d'))
+
+  a.get("https://www.nend.net/m/report/search/m?search_date=#{range}") do |page|
+    result['two_weeks_ago_payment'] = page.search('.payment_graph p').last.content.gsub(/[￥,]/, '').to_i
+  end
+
+  result['growth_per_week'] = (result['last_week_payment'].to_f / result['two_weeks_ago_payment'].to_f * 100.0 - 100.0).round(2)
 
   json result
 end
