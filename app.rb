@@ -3,6 +3,7 @@ require 'garb'
 require 'active_support/time'
 require 'sinatra'
 require 'sinatra/json'
+require 'rexml/document'
 require 'mechanize'
 require 'openssl'
 require 'certified'
@@ -48,6 +49,7 @@ get '/' do
     yesterday:  yesterday_pageviews,
     last_week:  last_week_pageviews,
     last_month: last_month_pageviews,
+    two_weeks_ago_pageviews: two_weeks_ago_pageviews,
     growth_per_week: growth_per_week.round(2)
   }
 end
