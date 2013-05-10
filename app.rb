@@ -48,7 +48,7 @@ get '/' do
     yesterday:  yesterday_pageviews,
     last_week:  last_week_pageviews,
     last_month: last_month_pageviews,
-    growth_per_week: growth_per_week
+    growth_per_week: growth_per_week.round(2)
   }
 end
 
