@@ -6,6 +6,7 @@ require 'sinatra/json'
 require 'mechanize'
 require 'openssl'
 require 'certified'
+require 'mixpanel_client'
 
 class PageView
   extend Garb::Model
@@ -30,6 +31,14 @@ get '/' do
   last_week_pageviews = analytics.first.pageviews
 
   analytics = profile.page_view(
+    start_date: yesterday.prev_week.prev_week,
+    end_date:   yesterday.prev_week
+  )
+  two_weeks_ago_pageviews = analytics.first.pageviews
+
+  growth_per_week = two_weeks_ago_pageviews.to_f / last_week_pageviews.to_f * 100.0
+
+  analytics = profile.page_view(
     start_date: yesterday.prev_month,
     end_date:   yesterday
   )
@@ -38,7 +47,8 @@ get '/' do
   json pageviews: {
     yesterday:  yesterday_pageviews,
     last_week:  last_week_pageviews,
-    last_month: last_month_pageviews
+    last_month: last_month_pageviews,
+    growth_per_week: growth_per_week
   }
 end
 
@@ -68,4 +78,33 @@ get '/profit' do
   end
 
   json result
+end
+
+get '/share' do
+client = Mixpanel::Client.new(
+  api_key: '222ed9530f1b66cee8811f32551f5687',
+  api_secret: '6e78d6fb8c5bc79ca04e05388a8f654e'
+)
+
+data = client.request('events', {
+  event:     '["Share","Signed up","Posted story"]',
+  type:      'general',
+  unit:      'day',
+  interval:   30,
+})
+
+result = []
+datapoints = []
+
+data["data"]["series"].each do |date|
+  datapoints << [data["data"]["values"]["Share"][date], Time.parse(date).to_i]
+end
+
+result << {'target' => 'share', 'datapoints' => datapoints}
+
+  json result
+end
+
+get '/value' do
+  json "value" => "8", "label" => "aaaaaaaaaaaa"
 end
