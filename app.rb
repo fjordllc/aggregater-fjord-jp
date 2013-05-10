@@ -37,7 +37,7 @@ get '/' do
   )
   two_weeks_ago_pageviews = analytics.first.pageviews
 
-  growth_per_week = two_weeks_ago_pageviews.to_f / last_week_pageviews.to_f * 100.0
+  growth_per_week = last_week_pageviews.to_f / two_weeks_ago_pageviews.to_f * 100.0 - 100.0
 
   analytics = profile.page_view(
     start_date: yesterday.prev_month,
